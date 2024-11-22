@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
+
 import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -46,13 +48,25 @@ public class TaskServiceTest {
     // ----- findTasks ----- //
     @Test
     @Transactional
-    void createTask_shouldPersistTasksInRepository(){
+    void findTasks_shouldReturnAllTasks(){
         Task taskTest = new Task();
-
         taskService.createdTask(taskTest);
 
         assertEquals(1, taskService.findTasks().size());
     }
+
+    // ----- findById ----- //
+
+    @Test
+    @Transactional
+    void findTaskById_shouldReturnTaskWhenExists() {
+        Task taskTest = new Task();
+        taskTest.setDescription("Test description");
+        taskService.createdTask(taskTest);
+
+        assertTrue(taskService.findById(taskRepository.findAll().get(0).getId()).isPresent(), "Task should be found by its ID");
+    }
+
 
 }
 

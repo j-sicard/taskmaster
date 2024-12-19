@@ -3,7 +3,7 @@ package com.taskmaster.taskmaster.service;
 import com.taskmaster.taskmaster.model.Task;
 import com.taskmaster.taskmaster.reporitory.TaskRepository;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,75 +14,73 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TaskServiceTest {
 
     @Autowired
-    TaskService taskService;
+    private TaskService taskService;
 
     @Autowired
-    TaskRepository taskRepository;
+    private TaskRepository taskRepository;
+
+    private Task taskTest;
+
+    @BeforeEach
+    public void setUp() {
+        taskTest = new Task();
+        taskTest.setDescription("Description for test");
+        taskService.createTask(taskTest);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        taskRepository.deleteAll();
+    }
 
     // ----- createTask ----- //
     @Test
     @Transactional
-    void createTask_shouldPersistTaskInRepository(){
-        Task taskTest = new Task();
-        taskTest.setDescription("Description for test");
+    void createTask_shouldPersistTaskInRepository() {
+        int tasksSizeBeforeCreateTaskForTest = taskRepository.findAll().size();
 
-        taskService.createTask(taskTest);
+        Task taskForCreateTaskTest = new Task();
+        taskForCreateTaskTest.setDescription("Description for create Task Test");
 
-        assertEquals(1, taskRepository.findAll().size());
+        taskService.createTask(taskForCreateTaskTest);
+
+        assertTrue(taskRepository.findAll().size() > tasksSizeBeforeCreateTaskForTest,
+                "The repository should contain 1 more Task.");
     }
+
 
     @Test
     @Transactional
     void createTask_shouldPersistTaskWithCorrectDescription() {
-        Task taskTest = new Task();
-        taskTest.setDescription("Description for test");
-
-        taskService.createTask(taskTest);
-
-        Task createdTask = taskRepository.findAll().get(0);
-        assertEquals("Description for test", createdTask.getDescription());
+        assertEquals("Description for test", taskRepository.findAll().get(0).getDescription(), "The description of the created task is incorrect.");
     }
 
     // ----- findTasks ----- //
     @Test
     @Transactional
-    void findTasks_shouldReturnAllTasks(){
-        Task taskTest = new Task();
-        taskService.createTask(taskTest);
-
-        assertEquals(1, taskService.findTasks().size());
+    void findTasks_shouldReturnAllTasks() {
+        assertEquals(1, taskService.findTasks().size(), "The method findTasks should return 1 task.");
     }
 
     // ----- findById ----- //
-
     @Test
     @Transactional
     void findTaskById_shouldReturnTaskWhenExists() {
-        Task taskTest = new Task();
-        taskTest.setDescription("Test description");
-        taskService.createTask(taskTest);
-
-       assertEquals(taskService.findById(taskTest.getId()).get().getDescription(),taskTest.getDescription());
+        Task foundTask = taskService.findById(taskTest.getId()).orElse(null);
+        assertNotNull(foundTask, "The task was not found by ID.");
+        assertEquals("Description for test", foundTask.getDescription(), "The task description found is incorrect.");
     }
 
     // ----- deleteTaskById ----- //
-
-
     @Test
     @Transactional
     void deleteTaskByIdTest() {
-        Task taskTest = new Task();
-        taskTest.setDescription("Test description");
-        taskService.createTask(taskTest);
-
-        assertTrue(taskService.findTasks().contains(taskTest), "taskTest is not create");
+        assertTrue(taskService.findTasks().contains(taskTest), "taskTest should exist before deletion.");
 
         taskService.deleteTaskById(taskTest.getId());
 
-        assertFalse(taskService.findTasks().contains(taskTest), "taskTest is not delete");
+        assertFalse(taskService.findTasks().contains(taskTest), "taskTest should no longer exist after deletion.");
     }
-
-
 }
 
 

@@ -12,4 +12,6 @@ public interface TaskService {
     public List<Task> findTasks();
 
     public Optional<Task> findById(Long id);
+
+    public void deleteTaskById(Long id);
 }

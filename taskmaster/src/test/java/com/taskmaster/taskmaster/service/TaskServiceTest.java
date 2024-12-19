@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.hibernate.validator.internal.util.Contracts.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class TaskServiceTest {
@@ -63,6 +63,23 @@ public class TaskServiceTest {
         taskService.createTask(taskTest);
 
        assertEquals(taskService.findById(taskTest.getId()).get().getDescription(),taskTest.getDescription());
+    }
+
+    // ----- deleteTaskById ----- //
+
+
+    @Test
+    @Transactional
+    void deleteTaskByIdTest() {
+        Task taskTest = new Task();
+        taskTest.setDescription("Test description");
+        taskService.createTask(taskTest);
+
+        assertTrue(taskService.findTasks().contains(taskTest), "taskTest is not create");
+
+        taskService.deleteTaskById(taskTest.getId());
+
+        assertFalse(taskService.findTasks().contains(taskTest), "taskTest is not delete");
     }
 
 

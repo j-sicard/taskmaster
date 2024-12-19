@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Optional;
-
 import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,7 +26,7 @@ public class TaskServiceTest {
         Task taskTest = new Task();
         taskTest.setDescription("Description for test");
 
-        taskService.createdTask(taskTest);
+        taskService.createTask(taskTest);
 
         assertEquals(1, taskRepository.findAll().size());
     }
@@ -39,7 +37,7 @@ public class TaskServiceTest {
         Task taskTest = new Task();
         taskTest.setDescription("Description for test");
 
-        taskService.createdTask(taskTest);
+        taskService.createTask(taskTest);
 
         Task createdTask = taskRepository.findAll().get(0);
         assertEquals("Description for test", createdTask.getDescription());
@@ -50,7 +48,7 @@ public class TaskServiceTest {
     @Transactional
     void findTasks_shouldReturnAllTasks(){
         Task taskTest = new Task();
-        taskService.createdTask(taskTest);
+        taskService.createTask(taskTest);
 
         assertEquals(1, taskService.findTasks().size());
     }
@@ -62,9 +60,9 @@ public class TaskServiceTest {
     void findTaskById_shouldReturnTaskWhenExists() {
         Task taskTest = new Task();
         taskTest.setDescription("Test description");
-        taskService.createdTask(taskTest);
+        taskService.createTask(taskTest);
 
-        assertTrue(taskService.findById(taskRepository.findAll().get(0).getId()).isPresent(), "Task should be found by its ID");
+       assertEquals(taskService.findById(taskTest.getId()).get().getDescription(),taskTest.getDescription());
     }
 
 

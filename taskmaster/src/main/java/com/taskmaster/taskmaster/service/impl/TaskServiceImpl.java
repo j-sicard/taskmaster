@@ -15,7 +15,7 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     TaskRepository taskRepository;
 
-    public void createdTask(Task task){
+    public void createTask(Task task){
         taskRepository.save(task);
     }
 

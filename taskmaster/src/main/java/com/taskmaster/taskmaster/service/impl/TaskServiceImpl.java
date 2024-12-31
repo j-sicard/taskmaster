@@ -27,7 +27,11 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findById(id);
     }
 
-    public void deleteTaskById(Long id){
-        taskRepository.deleteById(id);
+    public Boolean deleteTaskById(Long id){
+        if (!taskRepository.findById(id).isEmpty()){
+            taskRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

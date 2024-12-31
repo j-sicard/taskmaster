@@ -13,5 +13,5 @@ public interface TaskService {
 
     public Optional<Task> findById(Long id);
 
-    public void deleteTaskById(Long id);
+    public Boolean deleteTaskById(Long id);
 }

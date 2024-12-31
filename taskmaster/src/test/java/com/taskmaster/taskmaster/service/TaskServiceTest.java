@@ -48,7 +48,6 @@ public class TaskServiceTest {
                 "The repository should contain 1 more Task.");
     }
 
-
     @Test
     @Transactional
     void createTask_shouldPersistTaskWithCorrectDescription() {

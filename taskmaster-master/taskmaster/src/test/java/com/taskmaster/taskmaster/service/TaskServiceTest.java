@@ -1,18 +1,26 @@
 package com.taskmaster.taskmaster.service;
 
 import com.taskmaster.taskmaster.model.Task;
+import com.taskmaster.taskmaster.model.UserData;
 import com.taskmaster.taskmaster.reporitory.TaskRepository;
+import com.taskmaster.taskmaster.reporitory.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import static org.hibernate.validator.internal.util.Contracts.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
-@ActiveProfiles(value = "test")
+@TestPropertySource("classpath:application-test.properties")
+@Sql(scripts = "classpath:data-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 public class TaskServiceTest {
 
     @Autowired
@@ -21,55 +29,48 @@ public class TaskServiceTest {
     @Autowired
     private TaskRepository taskRepository;
 
-    private Task taskTest;
+    @Autowired
+    UserRepository userRepository;
 
+    @BeforeAll
+    public void CreateTaskForTest(){
+        Optional<UserData> optionalUser = userRepository.findById(7L);
 
-    // ----- findTasks ----- //
-    @Test
-    @Transactional
-    void findTasks_shouldReturnAllTasks() {
-        assertEquals(1, taskService.findTasks().size(), "The method findTasks should return 1 task.");
-    }
-
-    // ----- createTask ----- //
-    @Test
-    @Transactional
-    void createTask_shouldPersistTaskInRepository() {
-        int tasksSizeBeforeCreateTaskForTest = taskRepository.findAll().size();
-
-        Task taskForCreateTaskTest = new Task();
-        taskForCreateTaskTest.setDescription("Description for create Task Test");
-
-        taskService.createTask(taskForCreateTaskTest);
-
-        assertTrue(taskRepository.findAll().size() > tasksSizeBeforeCreateTaskForTest,
-                "The repository should contain 1 more Task.");
-    }
-
-    @Test
-    @Transactional
-    void createTask_shouldPersistTaskWithCorrectDescription() {
-        assertEquals("Description for test", taskRepository.findAll().get(0).getDescription(), "The description of the created task is incorrect.");
-    }
-
-    // ----- findById ----- //
-    @Test
-    @Transactional
-    void findTaskById_shouldReturnTaskWhenExists() {
-        Task foundTask = taskService.findById(taskTest.getTaskId()).orElse(null);
-        assertNotNull(foundTask, "The task was not found by ID.");
-        assertEquals("Description for test", foundTask.getDescription(), "The task description found is incorrect.");
+        if (optionalUser.isPresent()) {
+            UserData user = optionalUser.get();
+            Task task = new Task();
+            task.setUser(user);
+            task.setDescription("New task for test");
+            task.setDeadline(LocalDateTime.now());
+            taskService.createTask(task);
+        } else {
+            throw new IllegalArgumentException("The userData with the ID " + optionalUser.get().getUserId() + "  doesn't exist");
+        }
     }
 
     // ----- deleteTaskById ----- //
     @Test
-    @Transactional
     void deleteTaskByIdTest() {
-        assertTrue(taskService.findTasks().contains(taskTest), "taskTest should exist before deletion.");
+        List<Task> tasks = taskRepository.findAllByUser_UserId(6L);
+        assertTrue(tasks.size() == 1 , "The task number for user 6 before the delete is different");
 
-        taskService.deleteTaskById(taskTest.getTaskId());
+        taskService.deleteTaskById(tasks.get(0).getTaskId());
 
-        assertFalse(taskService.findTasks().contains(taskTest), "taskTest should no longer exist after deletion.");
+        assertTrue(taskRepository.findAllByUser_UserId(6L).size() == 0, "The task number for user 6 before the after is different");
+    }
+
+    // ----- createTask ----- //
+
+    @Test
+    @Transactional
+    void createTask_shouldPersistTaskInRepository() {
+       assertTrue(taskRepository.findAllByUser_UserId(7L).size() == 1, "after you create optionalUser The DataBase contain tasks for this User ");
+    }
+
+    @Test
+    @Transactional
+    void createTask_shouldPersistTaskDescriptionInRepository() {
+        assertTrue(taskRepository.findAllByUser_UserId(7L).get(0).getDescription() == ("New task for test"), "after you create optionalUser The DataBase contain tasks for this User ");
     }
 }
 

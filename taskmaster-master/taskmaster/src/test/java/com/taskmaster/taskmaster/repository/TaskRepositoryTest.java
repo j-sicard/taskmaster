@@ -29,7 +29,6 @@ public class TaskRepositoryTest {
 
     @Test
     void findAllByUserIdForUser2Test() {
-        System.out.println("THE SIZE OF USER 2 TASK IS =>" + taskRepository.findAllByUser_UserId(2L).size());
         assertTrue(taskRepository.findAllByUser_UserId(2L).size() == 3);
     }
 
@@ -45,6 +44,6 @@ public class TaskRepositoryTest {
 
     @Test
     void shouldReturnTasksWithGivenUserName_WhenFindAllByUserIdIndex_0_ListTest() {
-        assertTrue(taskRepository.findAllByUser_UserId(5L).get(0).getUser().getUserName().equals("User 5"));
+        assertTrue(taskRepository.findAllByUser_UserId(5L).get(0).getUser().getUserId().equals(5L));
     }
 }

@@ -24,8 +24,7 @@ public  class ExpireTasksManagementImpl implements ExpireTasksManagement {
          return duration.toHours() > 24;
     }
 
-    public void deleteExpiredTasks() {
-        List<Task> tasks = taskRepository.findAll();
+    public void deleteExpiredTasks(List<Task> tasks) {
         tasks.stream()
                 .filter(this::isExpiredMoreThan24Hours)
                 .forEach(taskRepository::delete);

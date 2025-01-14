@@ -14,23 +14,13 @@ import java.util.Optional;
 public class TaskServiceImpl implements TaskService {
 
     @Autowired
-    TaskRepository taskRepository;
+    private TaskRepository taskRepository;
 
     @Autowired
-    ExpireTasksManagement pastTaskManagement;
+    private ExpireTasksManagement expireTasksManagement;
 
     public void createTask(Task task){
         taskRepository.save(task);
-    }
-
-       public List<Task> findTasks(){
-        List<Task> tasks = taskRepository.findAll();
-       pastTaskManagement.deleteExpiredTasks();
-        return tasks;
-    }
-
-    public Optional<Task> findById(Long id){
-        return taskRepository.findById(id);
     }
 
     public Boolean deleteTaskById(Long id){
@@ -39,5 +29,12 @@ public class TaskServiceImpl implements TaskService {
             return true;
         }
         return false;
+    }
+
+    public List<Task> findAndCleanTasksByUserId(Long userId){
+        List<Task> tasks = taskRepository.findAllByUser_UserId(userId);
+        expireTasksManagement.deleteExpiredTasks(tasks);
+
+        return tasks;
     }
 }

@@ -48,16 +48,7 @@ public class TaskServiceTest {
         }
     }
 
-    // ----- deleteTaskById ----- //
-    @Test
-    void deleteTaskByIdTest() {
-        List<Task> tasks = taskRepository.findAllByUser_UserId(6L);
-        assertTrue(tasks.size() == 1 , "The task number for user 6 before the delete is different");
 
-        taskService.deleteTaskById(tasks.get(0).getTaskId());
-
-        assertTrue(taskRepository.findAllByUser_UserId(6L).size() == 0, "The task number for user 6 before the after is different");
-    }
 
     // ----- createTask ----- //
 
@@ -71,6 +62,17 @@ public class TaskServiceTest {
     @Transactional
     void createTask_shouldPersistTaskDescriptionInRepository() {
         assertTrue(taskRepository.findAllByUser_UserId(7L).get(0).getDescription() == ("New task for test"), "after you create optionalUser The DataBase contain tasks for this User ");
+    }
+
+    // ----- deleteTaskById ----- //
+    @Test
+    void deleteTaskByIdTest() {
+        List<Task> tasks = taskRepository.findAllByUser_UserId(6L);
+        assertTrue(tasks.size() == 1 , "The task number for user 6 before the delete is different");
+
+        taskService.deleteTaskById(tasks.get(0).getTaskId());
+
+        assertTrue(taskRepository.findAllByUser_UserId(6L).size() == 0, "The task number for user 6 before the after is different");
     }
 }
 

@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/task")
@@ -17,21 +16,11 @@ public class TaskController {
     @Autowired
     TaskService taskService;
 
-    @GetMapping("/tasks")
-    ResponseEntity<List<Task>> getTasks(){
-        return new ResponseEntity<>(taskService.findTasks(), HttpStatus.OK);
+    @GetMapping("/tasks/{userId}")
+    public ResponseEntity<List<Task>> getTasksByUserId(@PathVariable Long userId) {
+        List<Task> tasks = taskService.findAndCleanTasksByUserId(userId);
+            return ResponseEntity.ok(tasks);
     }
-
-    @GetMapping("/task/{taskId}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Long taskId) {
-        Optional<Task> task = taskService.findById(taskId);
-
-        if (task.isPresent()) {
-            return ResponseEntity.ok(task.get());
-        }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    }
-
 
     @PostMapping("/new")
     void newTask(@RequestBody Task newTask){
@@ -45,5 +34,4 @@ public class TaskController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task " + taskId + " not found.");
     }
-
 }

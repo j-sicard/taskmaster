@@ -1,6 +1,6 @@
 package com.taskmaster.taskmaster.service;
 
-import com.taskmaster.taskmaster.model.Task;
+import com.taskmaster.taskmaster.dto.TaskDTO;
 import com.taskmaster.taskmaster.model.UserData;
 import com.taskmaster.taskmaster.reporitory.TaskRepository;
 import com.taskmaster.taskmaster.reporitory.UserRepository;
@@ -17,8 +17,8 @@ import java.util.Optional;
 
 import static org.hibernate.validator.internal.util.Contracts.assertTrue;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestPropertySource("classpath:application-test.properties")
 @Sql(scripts = "classpath:data-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 public class TaskServiceTest {
@@ -33,46 +33,42 @@ public class TaskServiceTest {
     UserRepository userRepository;
 
     @BeforeAll
-    public void CreateTaskForTest(){
+    public void createTaskForTest() {
         Optional<UserData> optionalUser = userRepository.findById(7L);
-
         if (optionalUser.isPresent()) {
-            UserData user = optionalUser.get();
-            Task task = new Task();
-            task.setUser(user);
-            task.setDescription("New task for test");
-            task.setDeadline(LocalDateTime.now());
-            taskService.createTask(task);
+            TaskDTO taskDTO = new TaskDTO();
+            taskDTO.setDescription("New task for test");
+            taskDTO.setDeadline(LocalDateTime.parse("2011-11-11T11:11"));
+            taskDTO.setUserId(7L);
+            taskService.createTask(taskDTO, optionalUser.get());
         } else {
-            throw new IllegalArgumentException("The userData with the ID " + optionalUser.get().getUserId() + "  doesn't exist");
+            throw new RuntimeException("User not found with id 7");
         }
     }
-
-
 
     // ----- createTask ----- //
 
     @Test
     @Transactional
     void createTask_shouldPersistTaskInRepository() {
-       assertTrue(taskRepository.findAllByUser_UserId(7L).size() == 1, "after you create optionalUser The DataBase contain tasks for this User ");
+       assertTrue(taskRepository.findTasksByUserId(7L).size() == 1, "after you create optionalUser The DataBase contain tasks for this User ");
     }
 
     @Test
     @Transactional
     void createTask_shouldPersistTaskDescriptionInRepository() {
-        assertTrue(taskRepository.findAllByUser_UserId(7L).get(0).getDescription() == ("New task for test"), "after you create optionalUser The DataBase contain tasks for this User ");
+        assertTrue(taskRepository.findTasksByUserId(7L).get(0).getDescription() == ("New task for test"), "after you create optionalUser The DataBase contain tasks for this User ");
     }
 
     // ----- deleteTaskById ----- //
     @Test
     void deleteTaskByIdTest() {
-        List<Task> tasks = taskRepository.findAllByUser_UserId(6L);
+        List<TaskDTO> tasks = taskRepository.findTasksByUserId(6L);
         assertTrue(tasks.size() == 1 , "The task number for user 6 before the delete is different");
 
-        taskService.deleteTaskById(tasks.get(0).getTaskId());
+        taskService.deleteTaskById(tasks.get(0).getTaskDtoId());
 
-        assertTrue(taskRepository.findAllByUser_UserId(6L).size() == 0, "The task number for user 6 before the after is different");
+        assertTrue(taskRepository.findTasksByUserId(6L).size() == 0, "The task number for user 6 before the after is different");
     }
 }
 

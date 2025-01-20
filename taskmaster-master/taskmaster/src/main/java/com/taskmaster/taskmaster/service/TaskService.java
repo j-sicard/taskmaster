@@ -1,14 +1,16 @@
 package com.taskmaster.taskmaster.service;
 
+import com.taskmaster.taskmaster.dto.TaskDTO;
 import com.taskmaster.taskmaster.model.Task;
+import com.taskmaster.taskmaster.model.UserData;
 
 import java.util.List;
 
 public interface TaskService {
 
-    public void createTask(Task task);
+    public void createTask(TaskDTO taskDTO, UserData user);
 
     public Boolean deleteTaskById(Long id);
 
-    public List<Task> findAndCleanTasksByUserId(Long userId);
+    public List<TaskDTO>  findAllTaskByUserId(Long userId);
 }

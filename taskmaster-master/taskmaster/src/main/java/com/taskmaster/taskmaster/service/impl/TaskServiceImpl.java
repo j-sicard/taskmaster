@@ -47,4 +47,18 @@ public class TaskServiceImpl implements TaskService {
     public List<TaskDTO>  findAllTaskByUserId(Long userId){
         return taskRepository.findTasksByUserId(userId);
     }
+
+    public void modifyTaskById(Long taskId, TaskDTO taskModify) {
+        Task originalTask = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("Task with ID " + taskId + " not found"));
+
+        if (taskModify.getDescription() != null && !taskModify.getDescription().isEmpty()) {
+            originalTask.setDescription(taskModify.getDescription());
+        }
+        if (taskModify.getDeadline() != null && !taskModify.getDeadline().equals(originalTask.getDeadline())) {
+            originalTask.setDeadline(taskModify.getDeadline());
+        }
+        taskRepository.save(originalTask);
+    }
+
 }

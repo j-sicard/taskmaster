@@ -48,6 +48,24 @@ INSERT INTO user_data (user_id, user_name) VALUES (8L, 'User 8');
 INSERT INTO user_data (user_id, user_name) VALUES (10L, 'User 10');
 INSERT INTO task (user_id, description, deadline) VALUES (10L,  'Return description N°1 for User 10', '2025-01-15 10:00:00');
 
+--TaskController --
+
+-- GetFindTasksByUserId --
+
+-- getTask_ShouldIfStatusOk --
+INSERT INTO user_data (user_id, user_name) VALUES (11L, 'User 11');
+INSERT INTO task (user_id, description, deadline) VALUES (11L,  'Return description N°1 for User 11', '2025-01-15 10:00:00');
+INSERT INTO task (user_id, description, deadline) VALUES (11L,  'Return description N°2 for User 11', '2025-01-15 10:00:00');
+
+-- getTaskTest_NotFound --
+
+-- Don't use userData 12L for other test, it's reserved for this test --
+
+-- deleteTaskById_shouldIfStatusOk --
+INSERT INTO user_data (user_id, user_name) VALUES (13L, 'User 13');
+INSERT INTO task (user_id, description, deadline) VALUES (13L,  'Return description N°1 for User 13', '2025-01-15 10:00:00');
+
+
 
 
 

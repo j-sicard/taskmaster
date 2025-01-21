@@ -2,10 +2,7 @@ package com.taskmaster.taskmaster.controller;
 
 import com.taskmaster.taskmaster.business.TaskBusiness;
 import com.taskmaster.taskmaster.dto.TaskDTO;
-import com.taskmaster.taskmaster.model.Task;
-import com.taskmaster.taskmaster.model.UserData;
 import com.taskmaster.taskmaster.service.TaskService;
-import com.taskmaster.taskmaster.service.UserDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +20,11 @@ public class TaskController {
     @Autowired
     TaskBusiness taskBusiness;
 
-
+    //TODO exception for userid not found not created
     @GetMapping("/tasks/{userId}")
     public ResponseEntity<List<TaskDTO>> getTasksByUserId(@PathVariable Long userId) {
-        List<TaskDTO> tasks = taskService.findAllTaskByUserId(userId);
-            return ResponseEntity.ok(tasks);
+            return ResponseEntity.ok(taskBusiness.getTasksByUserId(userId));
     }
-
 
     //TODO ResponseEntity not created
     @PostMapping("/new")
@@ -38,11 +33,20 @@ public class TaskController {
     }
 
 
+    //TODO the if is probably a work logic
+    //TODO modify it for don't must test it
     @DeleteMapping("/delete/{taskId}")
     ResponseEntity<String> deleteTask(@PathVariable Long taskId) {
         if (taskService.deleteTaskById(taskId)) {
             return ResponseEntity.ok("Task " + taskId + " deleted.");
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task " + taskId + " not found.");
+    }
+
+
+    //TODO modify for use response entity
+    @PutMapping("/modify/{taskId}")
+    void modifyTask(@RequestBody TaskDTO taskDTO, @PathVariable Long taskId ){
+       taskBusiness.modifyTask(taskId, taskDTO);
     }
 }

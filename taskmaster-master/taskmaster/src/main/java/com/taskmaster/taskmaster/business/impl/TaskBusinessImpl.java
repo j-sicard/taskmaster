@@ -2,11 +2,12 @@ package com.taskmaster.taskmaster.business.impl;
 
 import com.taskmaster.taskmaster.business.TaskBusiness;
 import com.taskmaster.taskmaster.dto.TaskDTO;
-import com.taskmaster.taskmaster.model.UserData;
 import com.taskmaster.taskmaster.service.TaskService;
 import com.taskmaster.taskmaster.service.UserDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class TaskBusinessImpl implements TaskBusiness {
@@ -39,6 +40,18 @@ public class TaskBusinessImpl implements TaskBusiness {
     //TODO if user null
     public void createTask(TaskDTO task){
         taskService.createTask(task, userDataService.findUserDataById(task.getUserId()).orElseGet(null));
+    }
+
+
+    //TODO exception net created,
+    //TODO if userID null.
+    public List<TaskDTO> getTasksByUserId(Long userId){
+        return taskService.findAllTaskByUserId(userId);
+    }
+
+    //TODO exception or verify not created
+    public void modifyTask(Long taskId, TaskDTO taskModify){
+        taskService.modifyTaskById(taskId, taskModify);
     }
 
 }
